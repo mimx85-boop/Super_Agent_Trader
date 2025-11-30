@@ -1,0 +1,174 @@
+{
+  "timestamp": "2025-11-28T22:18:17.010833",
+  "symbols": [
+    "AAPL",
+    "MSFT",
+    "TSLA"
+  ],
+  "symbol_analysis": {
+    "AAPL": {
+      "symbol": "AAPL",
+      "file": "raw/AAPL/20251129_0246.parquet",
+      "data_points": 30,
+      "date_range": "2025-10-17 to 2025-11-28",
+      "current_price": 278.85,
+      "price_min": 252.29,
+      "price_max": 278.85,
+      "price_avg": 268.96333333333337,
+      "total_return": 10.527567481866118,
+      "daily_return_avg": 0.3524598685972458,
+      "daily_return_std": 1.1851377992351082,
+      "max_daily_gain": 3.943874113123802,
+      "max_daily_loss": -1.817113909181034,
+      "volatility": 1.1851377992351082,
+      "avg_price_range": 5.349333333333333,
+      "max_intraday_range": 9.509999999999991,
+      "avg_volume": 250105.54166666666,
+      "total_volume": 7503166.25,
+      "updays": 18,
+      "downdays": 11,
+      "win_rate": 60.0
+    },
+    "MSFT": {
+      "symbol": "MSFT",
+      "file": "raw/MSFT/20251129_0246.parquet",
+      "data_points": 30,
+      "date_range": "2025-10-17 to 2025-11-28",
+      "current_price": 492.01,
+      "price_min": 472.12,
+      "price_max": 542.07,
+      "price_avg": 507.021,
+      "total_return": -4.1999299038124605,
+      "daily_return_avg": -0.1388891113089937,
+      "daily_return_std": 1.3590812481641525,
+      "max_daily_gain": 1.984873570138479,
+      "max_daily_loss": -2.915704921059914,
+      "volatility": 1.3590812481641525,
+      "avg_price_range": 9.632333333333348,
+      "max_intraday_range": 18.069999999999993,
+      "avg_volume": 293593.11833333335,
+      "total_volume": 8807793.55,
+      "updays": 15,
+      "downdays": 14,
+      "win_rate": 50.0
+    },
+    "TSLA": {
+      "symbol": "TSLA",
+      "file": "raw/TSLA/20251129_0246.parquet",
+      "data_points": 30,
+      "date_range": "2025-10-17 to 2025-11-28",
+      "current_price": 430.17,
+      "price_min": 391.09,
+      "price_max": 468.37,
+      "price_avg": 432.9493333333333,
+      "total_return": -2.08053538503562,
+      "daily_return_avg": -0.02416447502263587,
+      "daily_return_std": 3.1591868039713438,
+      "max_daily_gain": 6.824516096039268,
+      "max_daily_loss": -6.644217371110084,
+      "volatility": 3.1591868039713438,
+      "avg_price_range": 18.615000000000002,
+      "max_intraday_range": 35.5,
+      "avg_volume": 1552914.339166667,
+      "total_volume": 46587430.17500001,
+      "updays": 16,
+      "downdays": 13,
+      "win_rate": 53.333333333333336
+    }
+  },
+  "comparison": [
+    {
+      "symbol": "AAPL",
+      "current_price": 278.85,
+      "total_return": 10.527567481866118,
+      "volatility": 1.1851377992351082,
+      "daily_return_avg": 0.3524598685972458,
+      "avg_volume": 250105.54166666666,
+      "win_rate": 60.0
+    },
+    {
+      "symbol": "MSFT",
+      "current_price": 492.01,
+      "total_return": -4.1999299038124605,
+      "volatility": 1.3590812481641525,
+      "daily_return_avg": -0.1388891113089937,
+      "avg_volume": 293593.11833333335,
+      "win_rate": 50.0
+    },
+    {
+      "symbol": "TSLA",
+      "current_price": 430.17,
+      "total_return": -2.08053538503562,
+      "volatility": 3.1591868039713438,
+      "daily_return_avg": -0.02416447502263587,
+      "avg_volume": 1552914.339166667,
+      "win_rate": 53.333333333333336
+    }
+  ],
+  "correlations": {
+    "correlations": {
+      "AAPL": {
+        "AAPL": 1.0,
+        "MSFT": -0.4046870679487141,
+        "TSLA": -0.19994767075974182
+      },
+      "MSFT": {
+        "AAPL": -0.4046870679487141,
+        "MSFT": 1.0,
+        "TSLA": 0.7155565143702259
+      },
+      "TSLA": {
+        "AAPL": -0.19994767075974182,
+        "MSFT": 0.7155565143702259,
+        "TSLA": 1.0
+      }
+    },
+    "data_shape": [
+      30,
+      3
+    ]
+  },
+  "volatility": {
+    "AAPL": {
+      "daily_volatility": 1.1851377992351082,
+      "annualized_volatility": 18.813479316710946,
+      "sharpe_ratio": 4.721077127270781,
+      "max_drawdown": -9.524834140218767
+    },
+    "MSFT": {
+      "daily_volatility": 1.3590812481641525,
+      "annualized_volatility": 21.574745965041643,
+      "sharpe_ratio": -1.6222696715214306,
+      "max_drawdown": -12.904237460106636
+    },
+    "TSLA": {
+      "daily_volatility": 3.1591868039713438,
+      "annualized_volatility": 50.150535771030825,
+      "sharpe_ratio": -0.12142338286287613,
+      "max_drawdown": -16.499775818263345
+    }
+  },
+  "performance_summary": {
+    "AAPL": {
+      "price": 278.85,
+      "return": 10.527567481866118,
+      "volatility": 1.1851377992351082,
+      "sharpe_approx": 0.29739990474080275,
+      "win_rate": 60.0
+    },
+    "MSFT": {
+      "price": 492.01,
+      "return": -4.1999299038124605,
+      "volatility": 1.3590812481641525,
+      "sharpe_approx": -0.10219338357924161,
+      "win_rate": 50.0
+    },
+    "TSLA": {
+      "price": 430.17,
+      "return": -2.08053538503562,
+      "volatility": 3.1591868039713438,
+      "sharpe_approx": -0.0076489541524607674,
+      "win_rate": 53.333333333333336
+    }
+  }
+}

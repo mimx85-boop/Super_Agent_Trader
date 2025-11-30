@@ -1,0 +1,9 @@
+ib-insync
+boto3
+pandas
+pyarrow
+lightgbm
+pyyaml
+black
+pytest
+flake8

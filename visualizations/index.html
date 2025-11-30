@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Agent Trader - Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #00CC96;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #00CC96;
+        }
+        header p {
+            color: #a0a0a0;
+            font-size: 0.95em;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(0, 204, 150, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .chart-card:hover {
+            border-color: rgba(0, 204, 150, 0.5);
+            box-shadow: 0 6px 12px rgba(0, 204, 150, 0.2);
+        }
+        .chart-card h3 {
+            color: #00CC96;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 5px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #707070;
+            font-size: 0.9em;
+            border-top: 1px solid rgba(0, 204, 150, 0.1);
+            margin-top: 30px;
+        }
+        a {
+            color: #00CC96;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SUPER AGENT TRADER - DASHBOARD</h1>
+            <p>Last Updated: 2025-11-28 22:24:39</p>
+            <p>Real-time analytics powered by your trading data in S3</p>
+        </header>
+        
+        <div class="dashboard-grid">
+            <div class="chart-card full-width">
+                <h3>Returns Comparison</h3>
+                <iframe src="comparison_returns.html" title="Returns Comparison"></iframe>
+            </div>
+            
+            <div class="chart-card">
+                <h3>AAPL - Price & Volume</h3>
+                <iframe src="AAPL_price_chart.html" title="AAPL Chart"></iframe>
+            </div>
+            
+            <div class="chart-card">
+                <h3>MSFT - Price & Volume</h3>
+                <iframe src="MSFT_price_chart.html" title="MSFT Chart"></iframe>
+            </div>
+            
+            <div class="chart-card">
+                <h3>TSLA - Price & Volume</h3>
+                <iframe src="TSLA_price_chart.html" title="TSLA Chart"></iframe>
+            </div>
+            
+            <div class="chart-card">
+                <h3>Volatility Comparison</h3>
+                <iframe src="volatility_comparison.html" title="Volatility"></iframe>
+            </div>
+            
+            <div class="chart-card">
+                <h3>Price Correlation Matrix</h3>
+                <iframe src="correlation_heatmap.html" title="Correlation"></iframe>
+            </div>
+        </div>
+        
+        <footer>
+            <p>For detailed analytics reports, see logs/analytics_data_*.json</p>
+            <p>Dashboard generated automatically by AnalyticsReporter</p>
+        </footer>
+    </div>
+</body>
+</html>

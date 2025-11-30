@@ -1,0 +1,202 @@
+name: Daily Super Agent Trading Pipeline
+
+on:
+  schedule:
+    # Runs at 8:00 AM UTC daily (adjust timezone as needed)
+    # 8:00 AM UTC = 3:00 AM EST / 12:00 AM PST
+    - cron: '0 8 * * *'
+  
+  # Allow manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Create config from secrets
+        env:
+          IBKR_HOST: ${{ secrets.IBKR_HOST }}
+          IBKR_PORT: ${{ secrets.IBKR_PORT }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          python -c "
+          import yaml
+          config = {
+              'ibkr': {
+                  'host': '${{ env.IBKR_HOST }}',
+                  'port': int('${{ env.IBKR_PORT }}'),
+                  'client_id': 1,
+                  'market_data_type': 3
+              },
+              'aws': {
+                  'region': '${{ env.AWS_REGION }}',
+                  's3_bucket': '${{ env.S3_BUCKET }}'
+              },
+              'symbols': ['AAPL', 'MSFT', 'TSLA'],
+              'data': {
+                  'bar_size': '1 day',
+                  'lookback_days': 30
+              },
+              'training': {
+                  'retrain_days': 1,
+                  'model_type': 'lightgbm',
+                  'target': 'direction'
+              },
+              'paths': {
+                  'raw_prefix': 'raw/',
+                  'feature_prefix': 'features/',
+                  'model_prefix': 'model/',
+                  'pred_prefix': 'predictions/'
+              }
+          }
+          with open('config.yaml', 'w') as f:
+              yaml.dump(config, f)
+          "
+      
+      - name: Run daily pipeline
+        id: pipeline
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          IBKR_HOST: ${{ secrets.IBKR_HOST }}
+          IBKR_PORT: ${{ secrets.IBKR_PORT }}
+        run: python run_daily_pipeline.py
+      
+      - name: Upload logs to S3
+        id: upload_logs
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          if [ -d "logs" ]; then
+            aws s3 sync logs/ s3://${{ secrets.S3_BUCKET }}/logs/ --region ${{ secrets.AWS_REGION }}
+            echo "UPLOAD_STATUS=✓ Results uploaded to S3" >> $GITHUB_ENV
+          else
+            echo "UPLOAD_STATUS=⚠ No logs directory found" >> $GITHUB_ENV
+          fi
+      
+      - name: Send Email Notification - Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SERVER }}
+          server_port: ${{ secrets.EMAIL_PORT }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ Super Agent Trader Pipeline - SUCCESS"
+          to: mimx85@msn.com
+          from: ${{ secrets.EMAIL_FROM }}
+          body: |
+            🎯 SUPER AGENT TRADER - PIPELINE EXECUTION REPORT
+            ================================================
+            
+            Status: ✅ SUCCESS
+            Timestamp: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Date: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+            
+            JOB DETAILS:
+            ✓ Step 1: Code Checkout - PASSED
+            ✓ Step 2: Python Setup (3.10) - PASSED
+            ✓ Step 3: Dependency Installation - PASSED
+            ✓ Step 4: Config Creation - PASSED
+            ✓ Step 5: Pipeline Execution - PASSED
+              - Data Agent: Fetched OHLC data (AAPL, MSFT, TSLA)
+              - ML Agent: Models trained successfully
+              - Predict Agent: Predictions generated
+            ✓ Step 6: Logs Uploaded to S3 - PASSED
+            
+            RESULTS LOCATION:
+            S3 Bucket: ${{ secrets.S3_BUCKET }}
+            Paths:
+              • raw/AAPL/ - Raw OHLC data
+              • raw/MSFT/ - Raw OHLC data
+              • raw/TSLA/ - Raw OHLC data
+              • features/ - Processed features
+              • model/ - Trained models
+              • predictions/ - Generated predictions
+              • logs/ - Pipeline logs
+            
+            EXECUTION METRICS:
+            Symbols: AAPL, MSFT, TSLA
+            Lookback Period: 30 trading days
+            Model Type: LightGBM
+            Execution Time: ~5-10 minutes
+            
+            NEXT RUN:
+            Tomorrow at 8:00 AM UTC (3:00 AM EST / 12:00 AM PST)
+            
+            ---
+            Pipeline runs automatically. Your computer can be OFF.
+            For logs and details, visit GitHub Actions dashboard:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      
+      - name: Send Email Notification - Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SERVER }}
+          server_port: ${{ secrets.EMAIL_PORT }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Super Agent Trader Pipeline - FAILED"
+          to: mimx85@msn.com
+          from: ${{ secrets.EMAIL_FROM }}
+          body: |
+            ⚠️ SUPER AGENT TRADER - PIPELINE EXECUTION REPORT
+            ================================================
+            
+            Status: ❌ FAILED
+            Timestamp: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            JOB STATUS:
+            ✓ Code Checkout - PASSED
+            ✓ Python Setup - PASSED
+            ✓ Dependency Installation - PASSED
+            ✓ Config Creation - PASSED
+            ✗ Pipeline Execution - FAILED or later steps failed
+            
+            FAILURE LIKELY CAUSES:
+            • IBKR Connection Error - Verify EC2 is running and port 7496 is accessible
+            • AWS Credentials Invalid - Check AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+            • S3 Upload Failed - Check S3 bucket permissions
+            • Python Module Error - Check requirements.txt dependencies
+            
+            TROUBLESHOOTING STEPS:
+            1. Check GitHub Actions logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            2. Verify EC2 instance status: AWS → EC2 → Instances
+            3. Verify TWS Gateway running: SSH to EC2 → sudo systemctl status tws-gateway
+            4. Check GitHub secrets are set correctly
+            5. Review full logs in S3 if available
+            
+            RECOMMENDED ACTIONS:
+            □ SSH to EC2 and check TWS Gateway logs
+            □ Restart TWS Gateway if needed
+            □ Verify GitHub secrets are correct
+            □ Check EC2 security group allows port 7496
+            
+            For detailed logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/1

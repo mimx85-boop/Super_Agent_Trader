@@ -1,0 +1,29 @@
+ibkr:
+  host: "127.0.0.1"
+  port: 7496
+  client_id: 1
+  market_data_type: 3     # 1 = live, 3 = delayed
+
+aws:
+  region: "us-east-1"
+  s3_bucket: "stock-trade-data-2025"
+
+symbols:
+  - AAPL
+  - MSFT
+  - TSLA
+
+data:
+  bar_size: "1 day"       # IBKR bar size, e.g. "1 min", "5 mins"
+  lookback_days: 30        # how many days of history to fetch when updating
+
+training:
+  retrain_days: 1         # for future logic if you want conditional retrain
+  model_type: "lightgbm"
+  target: "direction"     # or "return"
+
+paths:
+  raw_prefix: "raw/"
+  feature_prefix: "features/"
+  model_prefix: "model/"
+  pred_prefix: "predictions/"
