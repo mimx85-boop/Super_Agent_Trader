@@ -1,7 +1,7 @@
 """Analytics queries for Redshift data analysis."""
 import boto3
 import pandas as pd
-from s3_client import S3Client
+from utils.s3_client import S3Client
 import yaml
 from datetime import datetime
 

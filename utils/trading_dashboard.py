@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import yaml
-from s3_client import S3Client
+from utils.s3_client import S3Client
 
 
 class TradingDashboard:
