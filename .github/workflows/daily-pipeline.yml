@@ -46,6 +46,7 @@ jobs:
           chmod +x .github/scripts/get_daily_greeting.sh
           GREETING=$(.github/scripts/get_daily_greeting.sh)
           echo "GREETING=$GREETING" >> $GITHUB_ENV
+          echo "greeting=$GREETING" >> $GITHUB_OUTPUT
           echo "Daily greeting: $GREETING"
       
       - name: Create config from secrets

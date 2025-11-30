@@ -4,10 +4,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-try:
-    from utils.redshift_analytics import RedshiftAnalytics
-except ImportError:
-    from .redshift_analytics import RedshiftAnalytics
+from utils.redshift_analytics import RedshiftAnalytics
 import yaml
 
 
