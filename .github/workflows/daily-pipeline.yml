@@ -42,40 +42,7 @@ jobs:
           IBKR_PORT: ${{ secrets.IBKR_PORT }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: |
-          python -c "
-          import yaml
-          config = {
-              'ibkr': {
-                  'host': '${{ env.IBKR_HOST }}',
-                  'port': int('${{ env.IBKR_PORT }}'),
-                  'client_id': 1,
-                  'market_data_type': 3
-              },
-              'aws': {
-                  'region': '${{ env.AWS_REGION }}',
-                  's3_bucket': '${{ env.S3_BUCKET }}'
-              },
-              'symbols': ['AAPL', 'MSFT', 'TSLA'],
-              'data': {
-                  'bar_size': '1 day',
-                  'lookback_days': 30
-              },
-              'training': {
-                  'retrain_days': 1,
-                  'model_type': 'lightgbm',
-                  'target': 'direction'
-              },
-              'paths': {
-                  'raw_prefix': 'raw/',
-                  'feature_prefix': 'features/',
-                  'model_prefix': 'model/',
-                  'pred_prefix': 'predictions/'
-              }
-          }
-          with open('config.yaml', 'w') as f:
-              yaml.dump(config, f)
-          "
+        run: python create_config.py
       
       - name: Run daily pipeline
         id: pipeline
