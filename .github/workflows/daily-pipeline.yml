@@ -36,6 +36,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
+      - name: Generate daily greeting
+        id: greeting
+        run: |
+          chmod +x .github/scripts/get_daily_greeting.sh
+          GREETING=$(.github/scripts/get_daily_greeting.sh)
+          echo "GREETING=$GREETING" >> $GITHUB_ENV
+          echo "Daily greeting: $GREETING"
+      
       - name: Create config from secrets
         env:
           IBKR_HOST: ${{ secrets.IBKR_HOST }}
@@ -79,6 +87,8 @@ jobs:
           to: mimx85@msn.com
           from: ${{ secrets.EMAIL_FROM }}
           body: |
+            ${{ env.GREETING }} Welcome to your Daily Trading Report!
+            
             🎯 SUPER AGENT TRADER - PIPELINE EXECUTION REPORT
             ================================================
             
@@ -134,6 +144,8 @@ jobs:
           to: mimx85@msn.com
           from: ${{ secrets.EMAIL_FROM }}
           body: |
+            ${{ env.GREETING }} Daily Report - Attention Needed
+            
             ⚠️ SUPER AGENT TRADER - PIPELINE EXECUTION REPORT
             ================================================
             
