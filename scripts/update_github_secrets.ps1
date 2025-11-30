@@ -26,10 +26,10 @@ if ($LASTEXITCODE -ne 0) {
 # Find running instance public IP by Name tag
 Write-Host "Fetching EC2 public IP for instance tagged '$InstanceNameTag' in $Region..."
 $publicIp = aws ec2 describe-instances `
-  --region $Region `
-  --filters Name=tag:Name,Values=$InstanceNameTag Name=instance-state-name,Values=running `
-  --query 'Reservations[].Instances[].PublicIpAddress' `
-  --output text
+    --region $Region `
+    --filters Name=tag:Name, Values=$InstanceNameTag Name=instance-state-name, Values=running `
+    --query 'Reservations[].Instances[].PublicIpAddress' `
+    --output text
 
 if (-not $publicIp -or $publicIp -eq "None") {
     Write-Error "No running instance with tag Name=$InstanceNameTag found or no public IP."; exit 1
@@ -57,6 +57,7 @@ if ($LASTEXITCODE -ne 0) {
     $wf = gh workflow list -R $Repo --limit 10
     Write-Host $wf
     Write-Host "You can trigger manually from GitHub Actions tab."
-} else {
+}
+else {
     Write-Host "Workflow triggered. Check Actions tab for progress.";
 }
