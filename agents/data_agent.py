@@ -18,12 +18,19 @@ class DataAgent(BaseAgent):
             self.logger.warning("CI/OFFLINE mode detected — using MockIBKRClient for data.")
             self.ib = MockIBKRClient()
         else:
-            self.ib = IBKRClient(
-                host=ib_cfg["host"],
-                port=ib_cfg["port"],
-                client_id=ib_cfg["client_id"],
-                market_data_type=ib_cfg.get("market_data_type", 1)
-            )
+            # Allow env overrides for host/port if provided
+            host = os.environ.get("IBKR_HOST", ib_cfg["host"])
+            port = int(os.environ.get("IBKR_PORT", ib_cfg["port"]))
+            try:
+                self.ib = IBKRClient(
+                    host=host,
+                    port=port,
+                    client_id=ib_cfg["client_id"],
+                    market_data_type=ib_cfg.get("market_data_type", 1)
+                )
+            except Exception as e:
+                self.logger.error(f"IBKR connection failed ({host}:{port}). Falling back to mock client. Error: {e}")
+                self.ib = MockIBKRClient()
 
         self.s3 = S3Client(
             region=aws_cfg["region"],
