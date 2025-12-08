@@ -1,5 +1,8 @@
 from ib_insync import IB, Stock, util
 import pandas as pd
+import pandas as _pd
+import numpy as _np
+from datetime import datetime, timedelta
 
 
 class IBKRClient:
@@ -33,5 +36,38 @@ class IBKRClient:
             "close": "close",
             "volume": "volume"
         }, inplace=True)
+        df.set_index("time", inplace=True)
+        return df
+
+
+class MockIBKRClient:
+    """Mock client to generate deterministic OHLC data for CI/offline runs."""
+
+    def __init__(self, seed: int = 42):
+        self._rng = _np.random.default_rng(seed)
+
+    def get_historical_ohlc(self, symbol: str, bar_size: str, lookback_days: int) -> _pd.DataFrame:
+        # Only supports daily bars in mock; ignore bar_size variations.
+        end = datetime.utcnow().date()
+        dates = [end - timedelta(days=i) for i in range(lookback_days)]
+        dates.reverse()
+
+        base = 100.0 + abs(hash(symbol)) % 50
+        noise = self._rng.normal(0, 1, size=len(dates))
+
+        closes = base + _np.cumsum(noise)
+        opens = closes + self._rng.normal(0, 0.5, size=len(dates))
+        highs = _np.maximum(opens, closes) + abs(self._rng.normal(0, 0.7, size=len(dates)))
+        lows = _np.minimum(opens, closes) - abs(self._rng.normal(0, 0.7, size=len(dates)))
+        volumes = self._rng.integers(1_000_000, 5_000_000, size=len(dates))
+
+        df = _pd.DataFrame({
+            "time": [datetime.combine(d, datetime.min.time()) for d in dates],
+            "open": opens,
+            "high": highs,
+            "low": lows,
+            "close": closes,
+            "volume": volumes,
+        })
         df.set_index("time", inplace=True)
         return df

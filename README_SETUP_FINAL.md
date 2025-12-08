@@ -1,4 +1,4 @@
-# 🎯 FINAL SUMMARY - Everything is Ready!
+# 🎯 FINAL SUMMARY - Local Scheduler Recommended (Actions Disabled)
 
 ## What I've Done For You ✅
 
@@ -7,7 +7,7 @@ I've created a **complete, production-ready cloud infrastructure** for your Supe
 ### 📦 Created Files (6 new documentation + 1 workflow file):
 
 ```
-✅ .github/workflows/daily-pipeline.yml          - GitHub Actions workflow
+✅ .github/workflows/daily-pipeline.yml          - GitHub Actions workflow (disabled)
 ✅ NEXT_STEPS.md                                 - Your immediate action plan ⭐ START HERE
 ✅ SETUP_CHECKLIST.md                            - Progress checklist
 ✅ GITHUB_ACTIONS_SETUP.md                       - GitHub configuration guide
@@ -20,25 +20,37 @@ I've created a **complete, production-ready cloud infrastructure** for your Supe
 
 ## 🎯 What This Solves
 
-### Before (Windows Task Scheduler):
-❌ Computer must be ON at 8:00 AM
-❌ No cloud redundancy
-❌ Hard to monitor
-❌ Manual restart if it fails
+### Local Windows Task Scheduler (Recommended):
+✅ Runs where IBKR TWS/Gateway is available
+✅ Full control of environment/network
+✅ Simple, reliable daily automation
 
-### After (GitHub Actions + EC2):
-✅ **Computer can be OFF**
-✅ Runs in AWS cloud (24/7 reliability)
-✅ Easy GitHub dashboard monitoring
-✅ Auto-restarts on failure
-✅ Free for 12 months, then $10-15/month
-✅ Scales to any complexity
+### GitHub Actions (Disabled by default):
+⚠ Not suitable for real IBKR connections on hosted runners
+✅ Can be used for offline checks with `OFFLINE_MODE=true`
 
 ---
 
 ## 🚀 Your Exact Next Steps (Copy & Paste Ready)
 
-### Step 1: Push Code to GitHub (5 minutes)
+### Step 1: Set up Windows Task Scheduler (5 minutes)
+
+Use `setup_scheduler.ps1` or `run_scheduled_pipeline.ps1` to schedule `python run_daily_pipeline.py` on your machine with IBKR TWS/Gateway.
+
+Example manual setup command:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_scheduled_pipeline.ps1
+```
+
+If needed, install dependencies first:
+
+```powershell
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Step 2: (Optional) Push Code to GitHub
 
 ```powershell
 cd c:\Users\mimx8\Super_Agent_Trader
@@ -60,7 +72,7 @@ Click **"New repository secret"** and add these 4 secrets:
 4. S3_BUCKET = stock-trade-data-2025
 ```
 
-### Step 3: Set Up AWS EC2 (45 minutes)
+### Step 3: (Optional) Set Up AWS EC2
 
 **Open this file:** `EC2_TWS_SETUP.md`
 
@@ -84,7 +96,7 @@ Add 2 more secrets:
 6. IBKR_PORT = 7496
 ```
 
-### Step 5: Test the Workflow (10 minutes)
+### Step 5: (Optional) Test GitHub Actions Offline Mode
 
 1. Go to **GitHub.com** → Your Repo → **Actions** tab
 2. Click **"Daily Super Agent Trading Pipeline"**
@@ -103,18 +115,14 @@ Check AWS S3 bucket `stock-trade-data-2025`:
 
 ## 📊 What Happens Automatically (After Setup)
 
-### Every Day at 8:00 AM UTC:
+### Every Day at your scheduled time (Task Scheduler):
 
 ```
-GitHub Actions Triggers
+Task Scheduler triggers
     ↓
-Pulls your code from GitHub
+Runs `python run_daily_pipeline.py`
     ↓
-Installs Python dependencies
-    ↓
-Connects to EC2 (54.123.45.67:7496)
-    ↓
-EC2 connects to IBKR
+Connects to local IBKR TWS/Gateway
     ↓
 Fetches OHLC data (AAPL, MSFT, TSLA)
     ↓
@@ -123,8 +131,6 @@ ML Training & Predictions
 Uploads results to S3
     ↓
 Done! ✅
-
-All while your computer is OFF
 ```
 
 ---
@@ -144,15 +150,11 @@ All while your computer is OFF
 
 ## 💰 Cost Analysis
 
-### First 12 Months: **FREE**
-- AWS free tier covers everything
-- GitHub Actions is free
-- Total: $0/month
+### Local-only: **$0/month**
+- Runs on your machine via Task Scheduler
 
-### After 12 Months: **$10-15/month**
-- EC2 t2.micro: ~$8.76/month
-- Storage & data: ~$2/month
-- Total: ~$10-15/month (very affordable)
+### Optional Cloud: **$10-15/month** (after free tier)
+- If you choose to use EC2/TWS Gateway
 
 ---
 
@@ -200,22 +202,9 @@ You'll know everything is working when:
 
 ### Immediate (Next 5 Minutes):
 
-1. Open PowerShell
-2. Run the 3 git commands from Step 1 above
-3. Open GitHub.com and verify files uploaded
-
-### Next 5 Minutes:
-
-4. Create 4 GitHub secrets (AWS credentials)
-
-### Next 45 Minutes:
-
-5. Follow `EC2_TWS_SETUP.md` to set up AWS EC2
-
-### Final 10 Minutes:
-
-6. Test the workflow manually
-7. Verify results in S3
+1. Run Task Scheduler setup: `setup_scheduler.ps1` or `run_scheduled_pipeline.ps1`
+2. Ensure IBKR TWS/Gateway is running on the machine
+3. Verify `config.yaml` IBKR host/port (`127.0.0.1:7496` by default)
 
 ---
 

@@ -27,7 +27,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Fetching EC2 public IP for instance tagged '$InstanceNameTag' in $Region..."
 $publicIp = aws ec2 describe-instances `
     --region $Region `
-    --filters Name=tag:Name, Values=$InstanceNameTag Name=instance-state-name, Values=running `
+    --filters "Name=tag:Name,Values=$InstanceNameTag" "Name=instance-state-name,Values=running" `
     --query 'Reservations[].Instances[].PublicIpAddress' `
     --output text
 

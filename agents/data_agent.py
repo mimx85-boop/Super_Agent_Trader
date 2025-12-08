@@ -1,6 +1,7 @@
 from datetime import datetime
+import os
 from .base_agent import BaseAgent
-from utils.ibkr_client import IBKRClient
+from utils.ibkr_client import IBKRClient, MockIBKRClient
 from utils.s3_client import S3Client
 
 
@@ -12,12 +13,17 @@ class DataAgent(BaseAgent):
         ib_cfg = self.config["ibkr"]
         aws_cfg = self.config["aws"]
 
-        self.ib = IBKRClient(
-            host=ib_cfg["host"],
-            port=ib_cfg["port"],
-            client_id=ib_cfg["client_id"],
-            market_data_type=ib_cfg.get("market_data_type", 1)
-        )
+        use_mock = os.environ.get("OFFLINE_MODE") == "true" or os.environ.get("CI") == "true" or os.environ.get("GITHUB_ACTIONS") == "true"
+        if use_mock:
+            self.logger.warning("CI/OFFLINE mode detected — using MockIBKRClient for data.")
+            self.ib = MockIBKRClient()
+        else:
+            self.ib = IBKRClient(
+                host=ib_cfg["host"],
+                port=ib_cfg["port"],
+                client_id=ib_cfg["client_id"],
+                market_data_type=ib_cfg.get("market_data_type", 1)
+            )
 
         self.s3 = S3Client(
             region=aws_cfg["region"],

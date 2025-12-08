@@ -1,16 +1,12 @@
-name: Daily Super Agent Trading Pipeline
+name: Daily Super Agent Trading Pipeline (DISABLED)
 
 on:
-  schedule:
-    # Runs at 8:00 AM UTC daily (adjust timezone as needed)
-    # 8:00 AM UTC = 3:00 AM EST / 12:00 AM PST
-    - cron: '0 8 * * *'
-  
-  # Allow manual trigger from Actions tab
+  # Disabled: only allow manual dispatch if explicitly needed
   workflow_dispatch:
 
 jobs:
   run-pipeline:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
@@ -57,14 +53,14 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
         run: python create_config.py
       
-      - name: Run daily pipeline
+      - name: Run daily pipeline (disabled)
         id: pipeline
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           IBKR_HOST: ${{ secrets.IBKR_HOST }}
           IBKR_PORT: ${{ secrets.IBKR_PORT }}
-        run: python run_daily_pipeline.py
+        run: echo "Workflow disabled; skipping run_daily_pipeline.py"
       
       - name: Upload logs to S3
         id: upload_logs
