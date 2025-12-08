@@ -1,12 +1,7 @@
 name: Daily Super Agent Trading Pipeline
 
 on:
-  schedule:
-    # Runs at 8:00 AM UTC daily (adjust timezone as needed)
-    # 8:00 AM UTC = 3:00 AM EST / 12:00 AM PST
-    - cron: '0 8 * * *'
-  
-  # Allow manual trigger from Actions tab
+  # Allow manual trigger from Actions tab only
   workflow_dispatch:
 
 jobs:
