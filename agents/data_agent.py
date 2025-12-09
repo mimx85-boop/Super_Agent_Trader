@@ -73,13 +73,14 @@ class DataAgent(BaseAgent):
                     reader = csv.DictReader(f)
                     rows = []
                     for row in reader:
-                        sym = row.get("symbol") or row.get("ticker")
+                        sym = (row.get("symbol") or row.get("ticker") or "").strip()
                         try:
                             mc = float(row.get("market_cap", 0))
                         except (TypeError, ValueError):
                             mc = 0.0
-                        if sym:
-                            rows.append({"symbol": sym.strip(), "market_cap": mc})
+                        # Only accept valid symbols with positive market cap
+                        if sym and sym != "..." and mc > 0:
+                            rows.append({"symbol": sym, "market_cap": mc})
                     # Sort desc by market_cap and take top 1000
                     rows.sort(key=lambda r: r["market_cap"], reverse=True)
                     syms = [r["symbol"] for r in rows[:1000]]
