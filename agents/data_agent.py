@@ -3,6 +3,8 @@ import os
 from .base_agent import BaseAgent
 from utils.ibkr_client import IBKRClient, MockIBKRClient
 from utils.s3_client import S3Client
+from pathlib import Path
+import csv
 
 
 class DataAgent(BaseAgent):
@@ -46,7 +48,54 @@ class DataAgent(BaseAgent):
         key = f"{self.config['paths']['raw_prefix']}{symbol}/{date_str}.parquet"
         self.logger.info(f"Writing raw data for {symbol} to s3://{self.s3.bucket}/{key}")
         self.s3.write_parquet(df, key)
+        # Delete oldest file in symbol folder to keep storage tidy
+        deleted = self.s3.delete_oldest(f"{self.config['paths']['raw_prefix']}{symbol}/")
+        if deleted:
+            self.logger.info(f"Deleted oldest file for {symbol}: s3://{self.s3.bucket}/{deleted}")
 
     def run(self):
-        for symbol in self.config["symbols"]:
+        symbols = self._resolve_symbols()
+        self.logger.info(f"Symbols to update: {symbols}")
+        for symbol in symbols:
             self.update_symbol(symbol)
+
+    def _resolve_symbols(self):
+        # Support dynamic symbol resolution
+        cfg_syms = self.config.get("symbols")
+        if isinstance(cfg_syms, list) and cfg_syms:
+            return cfg_syms
+        if isinstance(cfg_syms, str) and cfg_syms.strip() == "*":
+            # Priority 1: local CSV at data/tickers.csv
+            csv_path = Path("data") / "tickers.csv"
+            if csv_path.exists():
+                syms = []
+                with csv_path.open("r", newline="") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        val = row.get("symbol") or row.get("ticker")
+                        if val:
+                            syms.append(val.strip())
+                if syms:
+                    return syms
+            # Priority 2: latest analytics_symbols_*.csv
+            logs_dir = Path("logs")
+            candidates = sorted(logs_dir.glob("analytics_symbols_*.csv"))
+            if candidates:
+                latest = candidates[-1]
+                syms = []
+                with latest.open("r", newline="") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if "symbol" in row and row["symbol"]:
+                            syms.append(row["symbol"].strip())
+                if syms:
+                    return syms
+            # Priority 3: discover prefixes in S3 under raw/
+            raw_prefix = self.config["paths"]["raw_prefix"]
+            prefixes = self.s3.list_prefixes(raw_prefix)
+            syms = [p.replace(raw_prefix, "").strip("/") for p in prefixes]
+            if syms:
+                return syms
+        # Final fallback: empty list
+        self.logger.warning("No symbols found. Ensure config.yaml symbols list or set symbols: '*'.")
+        return []
