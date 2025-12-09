@@ -65,7 +65,27 @@ class DataAgent(BaseAgent):
         if isinstance(cfg_syms, list) and cfg_syms:
             return cfg_syms
         if isinstance(cfg_syms, str) and cfg_syms.strip() == "*":
-            # Priority 1: local CSV at data/tickers.csv
+            # Priority 1: local CSV with market caps: data/top_market_cap.csv
+            topcap_path = Path("data") / "top_market_cap.csv"
+            if topcap_path.exists():
+                syms = []
+                with topcap_path.open("r", newline="") as f:
+                    reader = csv.DictReader(f)
+                    rows = []
+                    for row in reader:
+                        sym = row.get("symbol") or row.get("ticker")
+                        try:
+                            mc = float(row.get("market_cap", 0))
+                        except (TypeError, ValueError):
+                            mc = 0.0
+                        if sym:
+                            rows.append({"symbol": sym.strip(), "market_cap": mc})
+                    # Sort desc by market_cap and take top 1000
+                    rows.sort(key=lambda r: r["market_cap"], reverse=True)
+                    syms = [r["symbol"] for r in rows[:1000]]
+                if syms:
+                    return syms
+            # Priority 2: local CSV at data/tickers.csv
             csv_path = Path("data") / "tickers.csv"
             if csv_path.exists():
                 syms = []
@@ -77,7 +97,7 @@ class DataAgent(BaseAgent):
                             syms.append(val.strip())
                 if syms:
                     return syms
-            # Priority 2: latest analytics_symbols_*.csv
+            # Priority 3: latest analytics_symbols_*.csv
             logs_dir = Path("logs")
             candidates = sorted(logs_dir.glob("analytics_symbols_*.csv"))
             if candidates:
@@ -90,7 +110,7 @@ class DataAgent(BaseAgent):
                             syms.append(row["symbol"].strip())
                 if syms:
                     return syms
-            # Priority 3: discover prefixes in S3 under raw/
+            # Priority 4: discover prefixes in S3 under raw/
             raw_prefix = self.config["paths"]["raw_prefix"]
             prefixes = self.s3.list_prefixes(raw_prefix)
             syms = [p.replace(raw_prefix, "").strip("/") for p in prefixes]
