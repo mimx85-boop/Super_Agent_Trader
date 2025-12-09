@@ -64,6 +64,21 @@ Edit `config.yaml` to customize:
 .\venv\Scripts\python main.py
 ```
 
+## Dynamic Symbols & S3 Retention
+
+- Symbols are now dynamic. Set `symbols: "*"` in `config.yaml` to auto-discover:
+  - Prefer latest `logs/analytics_symbols_*.csv` (uses the `symbol` column)
+  - Fallback to existing S3 prefixes under `raw/` (e.g., `raw/AAPL/`, `raw/MSFT/`)
+
+- S3 retention: after uploading `raw/{symbol}/{timestamp}.parquet`, the oldest file in that symbol folder is deleted to keep storage tidy.
+
+- To pin symbols, set an explicit list in `config.yaml` (e.g., `symbols: ["AAPL", "MSFT"]`).
+
+## GitHub Actions Workflow
+
+- The daily pipeline step is disabled and the cron schedule removed; other steps execute and report success.
+- Manual runs will skip `python run_daily_pipeline.py`. Local Windows Task Scheduler remains recommended for production runs with IBKR.
+
 Expected output:
 ```
 Step 1: Updating data from IBKR → S3

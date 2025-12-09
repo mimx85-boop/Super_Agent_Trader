@@ -146,13 +146,15 @@ Connect to EC2:7496
     ↓
 Connect to IBKR
     ↓
-Fetch: AAPL, MSFT, TSLA (30 days)
+Fetch: dynamic symbols from `logs/analytics_symbols_*.csv` or existing S3 `raw/` folders (30 days)
     ↓
 Train: ML models
     ↓
 Generate: Predictions
     ↓
 Upload: S3 + Logs
+    ↓
+Retention: delete oldest file in each `raw/{symbol}/` folder
     ↓
 Complete ✓
 ```

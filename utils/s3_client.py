@@ -2,6 +2,7 @@ import boto3
 import pandas as pd
 from io import BytesIO
 from typing import List, Optional
+from botocore.exceptions import ClientError
 
 
 class S3Client:
@@ -49,3 +50,33 @@ class S3Client:
             return None
         keys.sort()
         return keys[-1]
+
+    def list_prefixes(self, prefix: str) -> List[str]:
+        """List 'folders' (common prefixes) directly under the given prefix."""
+        prefixes: List[str] = []
+        continuation_token = None
+        while True:
+            kwargs = {"Bucket": self.bucket, "Prefix": prefix, "Delimiter": "/"}
+            if continuation_token:
+                kwargs["ContinuationToken"] = continuation_token
+            resp = self.s3.list_objects_v2(**kwargs)
+            for p in resp.get("CommonPrefixes", []):
+                prefixes.append(p["Prefix"])  # e.g., raw/AAPL/
+            if resp.get("IsTruncated"):
+                continuation_token = resp.get("NextContinuationToken")
+            else:
+                break
+        return prefixes
+
+    def delete_oldest(self, prefix: str) -> Optional[str]:
+        """Delete the oldest object under the given prefix. Returns deleted key or None."""
+        keys = self.list_keys(prefix)
+        if not keys or len(keys) < 2:
+            return None
+        keys.sort()
+        oldest = keys[0]
+        try:
+            self.s3.delete_object(Bucket=self.bucket, Key=oldest)
+            return oldest
+        except ClientError:
+            return None
