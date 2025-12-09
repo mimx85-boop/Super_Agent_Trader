@@ -8,10 +8,7 @@ aws:
   region: "us-east-1"
   s3_bucket: "stock-trade-data-2025"
 
-symbols:
-  - AAPL
-  - MSFT
-  - TSLA
+symbols: "*"
 
 data:
   bar_size: "1 day"       # IBKR bar size, e.g. "1 min", "5 mins"
